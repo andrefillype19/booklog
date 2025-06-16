@@ -20,18 +20,18 @@ import androidx.compose.runtime.remember
 
 
 data class Book(
-    val id: Int,
     val title: String,
-    val imageResId: Int
+    val imageResId: Int,
+    val totalPages: Int,
+    val pagesRead: Int
 )
 
 @Composable
 fun HomeScreen(
+    books: List<Book>,
     onBookClick: (Book) -> Unit = {},
     onAddBookClick: () -> Unit = {}
 ) {
-
-    val books = remember { mutableStateListOf<Book>() }
 
     Scaffold(
         floatingActionButton = {
@@ -95,10 +95,4 @@ fun BookItem(book: Book, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = book.title)
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen()
 }
