@@ -21,7 +21,6 @@ fun AppNavigation() {
             HomeScreen(
                 books = books,
                 onAddBookClick = { navController.navigate(Routes.ADD_BOOK) }
-                //onBookClick = { navController.navigate(Routes.HOME) }
             )
         }
         composable(Routes.ADD_BOOK) {
@@ -37,5 +36,3 @@ fun AppNavigation() {
         }
     }
 }
-
-

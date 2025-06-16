@@ -9,21 +9,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 
 
 data class Book(
     val title: String,
     val imageResId: Int,
     val totalPages: Int,
-    val pagesRead: Int
+    val pagesRead: Int,
+    val startDate: String,
+    val finishDate: String,
+    val isFavorite: Boolean = false
 )
 
 @Composable
@@ -32,18 +32,10 @@ fun HomeScreen(
     onBookClick: (Book) -> Unit = {},
     onAddBookClick: () -> Unit = {}
 ) {
-
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddBookClick,
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Text(
-                    text = "+",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+            FloatingActionButton(onClick = onAddBookClick) {
+                Text("+")
             }
         },
         floatingActionButtonPosition = FabPosition.End
@@ -55,15 +47,10 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            Text(
-                text = "Meus Livros",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
+            Text("Meus Livros", fontSize = 30.sp, fontWeight = FontWeight.Bold)
 
             if (books.isEmpty()) {
-                Text("Nenhum livro cadastrado. Clique no + para adicionar.")
+                Text("Nenhum livro adicionado. Clique no + para adicionar.")
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -80,19 +67,47 @@ fun HomeScreen(
 
 @Composable
 fun BookItem(book: Book, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-
         Image(
             painter = painterResource(id = book.imageResId),
             contentDescription = "Capa do livro ${book.title}",
-            modifier = Modifier
-                .size(100.dp)
-                .clickable { onClick() }
+            modifier = Modifier.size(100.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = book.title)
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(book.title,
+                color = if (book.isFavorite) Color(0xFFFFD700) else MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val progress = if (book.totalPages > 0) book.pagesRead.toFloat() / book.totalPages else 0f
+            LinearProgressIndicator(
+                progress = { progress },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text("Páginas: ${book.pagesRead} / ${book.totalPages}")
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text("Início: ${book.startDate}")
+
+            if (book.finishDate.isBlank()) {
+                Text("Fim: Ainda não finalizado.")
+            } else {
+                Text("Fim: ${book.finishDate}")
+            }
+        }
     }
 }
